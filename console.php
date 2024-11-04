@@ -1,14 +1,23 @@
 <?php
-$currency = $argv[1];
-$pair = $argv[2];
-$apiUrl = 'https://api.coinbase.com/v2/prices/' . $currency . '-' . $pair . '/spot';
+$currencyGet = $argv[1];
+$pairGet = $argv[2];
+$apiUrl = 'https://api.coinbase.com/v2/prices/' . $currencyGet . '-' . $pairGet . '/spot';
+$apiCurrency = 'https://api.coinbase.com/v2/currencies';
+$apiCryptoCurrency = 'https://api.coinbase.com/v2/currencies/crypto';
+
+function data($api)
+{;
+    $json = file_get_contents($api);
+    $dataArray = json_decode($json, true);
+    return $dataArray;
+}
 
 // Error handling
-if (($currency === null || $pair === null) || $currency === 'help') {
+if (($currencyGet === null || $pairGet === null) || $currencyGet === 'help') {
     echo ('Help text');
     die;
-} else if ((strlen($currency) !== 3 && strlen($currency) !== 4) || strlen($pair) !== 3) {
-    echo ('Error: Wrong currency token');
+} else if ((strlen($currencyGet) < 3 && strlen($currencyGet) > 10) || strlen($pairGet) !== 3) {
+    echo ('Error: Not a currency token');
     die;
 }
 
@@ -17,9 +26,19 @@ if (file_get_contents($apiUrl) === false) {
     die;
 };
 
-// Valid data
-$json = file_get_contents($apiUrl);
+$currencyPair = data($apiUrl);
+echo sprintf('%s: %.2f %s', $currencyPair['data']['base'], $currencyPair['data']['amount'], $currencyPair['data']['currency']);
 
-$displayData = json_decode($json, true);
+$currencies = data($apiCurrency);
+$currenciesList = [];
+foreach ($currencies['data'] as $currency) {
+    $currenciesList[] = $currency['id'];
+}
 
-echo sprintf('%s: %.2f %s', $displayData['data']['base'], $displayData['data']['amount'], $displayData['data']['currency']);
+$crypto = data($apiCryptoCurrency);
+$cryptoList = [];
+foreach ($crypto['data'] as $cry) {
+    $cryptoList[] = $cry['code'];
+}
+
+var_dump($cryptoList);
