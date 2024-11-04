@@ -1,10 +1,11 @@
 <?php
-$apiUrl = 'https://api.coinbase.com/v2/prices/BTC-USD/spot';
+$currency = $argv[1];
+$pair = $argv[2];
+
+$apiUrl = 'https://api.coinbase.com/v2/prices/' . $currency . '-' . $pair . '/spot';
 
 $json = file_get_contents($apiUrl);
 
 $displayData = json_decode($json, true);
 
-echo $displayData['data']['base'] . ': ';
-echo $displayData['data']['amount'] . ' ';
-echo $displayData['data']['currency'];
+echo sprintf('%s: %.2f %s', $displayData['data']['base'], $displayData['data']['amount'], $displayData['data']['currency']);
