@@ -1,9 +1,9 @@
 <?php
-$currency = $argv[1];
-$pair = $argv[2];
+$currency = $argv[1] ?? null;
+$pair = $argv[2] ?? null;
 
-if (($currency === null || $pair === null) || $currency === 'help') {
-    echo ('Help text');
+if ($currency === null || $pair === null || $currency === 'help') {
+    echo sprintf('Error: Wrong input');
     die;
 }
 
