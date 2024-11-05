@@ -1,19 +1,19 @@
 <?php
-$currency = $argv[1];
-$pair = $argv[2];
+$currency = $argv[1] ?? null;
+$pair = $argv[2] ?? null;
 $apiUrl = 'https://api.coinbase.com/v2/prices/' . $currency . '-' . $pair . '/spot';
 
 // Error handling
-if (($currency === null || $pair === null) || $currency === 'help') {
-    echo ('Help text');
+if ($currency === null || $pair === null || $currency === 'help') {
+    echo sprintf('Error message: Missing arguments in the input - example: BTC USD');
     die;
-} else if ((strlen($currency) !== 3 && strlen($currency) !== 4) || strlen($pair) !== 3) {
-    echo ('Error: Wrong currency token');
+} else if ((strlen($currency) < 3 && strlen($currency) > 10) || strlen($pair) !== 3) {
+    echo ('Error message: Wrong crypto or currency token length');
     die;
 }
 
 if (file_get_contents($apiUrl) === false) {
-    echo ('Error: Wrong currency pair');
+    echo ('Error message: Wrong crypto or currency token');
     die;
 };
 
