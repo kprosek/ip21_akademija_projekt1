@@ -7,6 +7,7 @@ if ($currency === null || $pair === null || $currency === 'help') {
     die;
 }
 
+
 $apiUrl = 'https://api.coinbase.com/v2/prices/' . $currency . '-' . $pair . '/spot';
 
 $json = file_get_contents($apiUrl);
