@@ -27,8 +27,13 @@ foreach ($crypto['data'] as $cry) {
 }
 
 // Error handling
-if ($cryptoGet === null || $currencyGet === null || $cryptoGet === 'help') {
-    echo sprintf('Error message: Missing arguments in the input - example: BTC USD');
+if ($currency === null || $pair === null) {
+    echo sprintf('Error message: Missing arguments in the input');
+    die;
+}
+
+if ($currency === 'help') {
+    echo sprintf('Error message: Need to add arguments in the input - example: BTC USD');
     die;
 }
 
@@ -37,15 +42,15 @@ if ((strlen($cryptoGet) < 3 && strlen($cryptoGet) > 10) || strlen($currencyGet) 
     die;
 }
 
-if (file_get_contents($apiUrl) === false) {
-    echo sprintf('Error message: Wrong token or unsupported token pair');
-    die;
-};
-
 if (in_array($cryptoGet, $cryptoList) === false || in_array($currencyGet, $currenciesList) === false) {
     echo sprintf('Error message: Invalid crypto - currency pair');
     die;
 }
+
+if (file_get_contents($apiUrl) === false) {
+    echo sprintf('Error message: Wrong token or unsupported token pair');
+    die;
+};
 
 // Output of data
 $currencyPair = getApiData($apiUrl);
