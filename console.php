@@ -12,6 +12,7 @@ function getApiData($api)
     return $dataArray;
 }
 
+
 // GET Currencies
 $currencies = getApiData($apiCurrency);
 $currenciesList = [];
@@ -27,7 +28,7 @@ foreach ($crypto['data'] as $cry) {
 }
 
 // Error handling
-if ($cryptoGet === null && $currencyGet === null) {
+if ($cryptoGet === null || $currencyGet === null) {
     echo sprintf('Error message: Missing arguments in the input');
     die;
 }
