@@ -1,32 +1,68 @@
 <?php
-$currency = $argv[1] ?? null;
-$pair = $argv[2] ?? null;
-$apiUrl = 'https://api.coinbase.com/v2/prices/' . $currency . '-' . $pair . '/spot';
+$cryptoGet = $argv[1] ?? null;
+$currencyGet = $argv[2] ?? null;
+$apiUrl = 'https://api.coinbase.com/v2/prices/' . $cryptoGet . '-' . $currencyGet . '/spot';
 
-// Error handling
-if ($currency === null || $pair === null) {
-    echo sprintf('Error message: Missing arguments in the input');
-    die;
+function getApiData($api)
+{
+    $json = file_get_contents($api);
+    $dataArray = json_decode($json, true);
+    return $dataArray;
 }
-
-if ($currency === 'help') {
+if ($cryptoGet === 'help') {
     echo sprintf('Error message: Need to add arguments in the input - example: BTC USD');
     die;
 }
 
-if ((strlen($currency) < 3 && strlen($currency) > 10) || strlen($pair) !== 3) {
+// GET Currencies
+function currencyList()
+{
+    $api = 'https://api.coinbase.com/v2/currencies';
+    $currencies = getApiData($api);
+    $list = [];
+    foreach ($currencies['data'] as $currency) {
+        $list[] = $currency['id'];
+    }
+    return $list;
+}
+
+$currencies = currencyList();
+
+// GET Crypto Currencies
+function cryptoList()
+{
+    $api = 'https://api.coinbase.com/v2/currencies/crypto';
+    $crypto = getApiData($api);
+    $list = [];
+    foreach ($crypto['data'] as $cry) {
+        $list[] = $cry['code'];
+    }
+    return $list;
+}
+
+$crypto = cryptoList();
+
+// Error handling
+if ($cryptoGet === null || $currencyGet === null) {
+    echo sprintf('Error message: Missing arguments in the input');
+    die;
+}
+
+if ((strlen($cryptoGet) < 3 || strlen($cryptoGet) > 10) || strlen($currencyGet) !== 3) {
     echo sprintf('Error message: Wrong crypto or currency token length');
     die;
 }
 
+if (in_array($cryptoGet, $cryptoList) === false || in_array($currencyGet, $currenciesList) === false) {
+    echo sprintf('Error message: Invalid crypto or currency token');
+    die;
+}
+
 if (file_get_contents($apiUrl) === false) {
-    echo sprintf('Error message: Wrong crypto or currency token');
+    echo sprintf('Error message: Unsupported token pair');
     die;
 };
 
-// Valid data
-$json = file_get_contents($apiUrl);
-
-$displayData = json_decode($json, true);
-
-echo sprintf('%s: %.2f %s', $displayData['data']['base'], $displayData['data']['amount'], $displayData['data']['currency']);
+// Output of data
+$currencyPair = getApiData($apiUrl);
+echo sprintf('%s: %.2f %s', $currencyPair['data']['base'], $currencyPair['data']['amount'], $currencyPair['data']['currency']);
