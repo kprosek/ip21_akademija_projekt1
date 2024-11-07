@@ -19,12 +19,10 @@ function getApiData($api)
 
     return $dataArray;
 }
-
 if ($cryptoGet === 'help') {
     echo sprintf('Error message: Need to add arguments in the input - example: BTC USD');
     die;
 }
-
 
 // GET Currencies
 function currencyList()
@@ -59,7 +57,6 @@ if ($cryptoGet === null || $currencyGet === null) {
     echo sprintf('Error message: Missing arguments in the input');
     die;
 }
-
 
 if ((strlen($cryptoGet) < 3 || strlen($cryptoGet) > 10) || strlen($currencyGet) !== 3) {
     echo sprintf('Error message: Wrong crypto or currency token length');
