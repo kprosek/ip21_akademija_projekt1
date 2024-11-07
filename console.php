@@ -8,7 +8,17 @@ $apiCryptoCurrency = 'https://api.coinbase.com/v2/currencies/crypto';
 function getApiData($api)
 {
     $json = file_get_contents($api);
+    if (empty($json)) {
+        echo sprintf('Error message: .json file is empty');
+        die;
+    }
+
     $dataArray = json_decode($json, true);
+    if ($dataArray === null) {
+        echo sprintf('Error message: invalid input .json file');
+        die;
+    }
+
     return $dataArray;
 }
 
