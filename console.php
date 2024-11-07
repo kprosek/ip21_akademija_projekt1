@@ -2,8 +2,6 @@
 $cryptoGet = $argv[1] ?? null;
 $currencyGet = $argv[2] ?? null;
 $apiUrl = 'https://api.coinbase.com/v2/prices/' . $cryptoGet . '-' . $currencyGet . '/spot';
-$apiCurrency = 'https://api.coinbase.com/v2/currencies';
-$apiCryptoCurrency = 'https://api.coinbase.com/v2/currencies/crypto';
 
 function getApiData($api)
 {
@@ -22,19 +20,39 @@ function getApiData($api)
     return $dataArray;
 }
 
-// GET Currencies
-$currencies = getApiData($apiCurrency);
-$currenciesList = [];
-foreach ($currencies['data'] as $currency) {
-    $currenciesList[] = $currency['id'];
+if ($cryptoGet === 'help') {
+    echo sprintf('Error message: Need to add arguments in the input - example: BTC USD');
+    die;
 }
 
-// GET Crypto Currencies
-$crypto = getApiData($apiCryptoCurrency);
-$cryptoList = [];
-foreach ($crypto['data'] as $cry) {
-    $cryptoList[] = $cry['code'];
+
+// GET Currencies
+function currencyList()
+{
+    $api = 'https://api.coinbase.com/v2/currencies';
+    $currencies = getApiData($api);
+    $list = [];
+    foreach ($currencies['data'] as $currency) {
+        $list[] = $currency['id'];
+    }
+    return $list;
 }
+
+$currencies = currencyList();
+
+// GET Crypto Currencies
+function cryptoList()
+{
+    $api = 'https://api.coinbase.com/v2/currencies/crypto';
+    $crypto = getApiData($api);
+    $list = [];
+    foreach ($crypto['data'] as $cry) {
+        $list[] = $cry['code'];
+    }
+    return $list;
+}
+
+$crypto = cryptoList();
 
 // Error handling
 if ($cryptoGet === null || $currencyGet === null) {
@@ -42,10 +60,6 @@ if ($cryptoGet === null || $currencyGet === null) {
     die;
 }
 
-if ($cryptoGet === 'help') {
-    echo sprintf('Error message: Need to add arguments in the input - example: BTC USD');
-    die;
-}
 
 if ((strlen($cryptoGet) < 3 || strlen($cryptoGet) > 10) || strlen($currencyGet) !== 3) {
     echo sprintf('Error message: Wrong crypto or currency token length');
