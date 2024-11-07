@@ -12,7 +12,6 @@ function getApiData($api)
     return $dataArray;
 }
 
-
 // GET Currencies
 $currencies = getApiData($apiCurrency);
 $currenciesList = [];
