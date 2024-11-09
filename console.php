@@ -3,8 +3,6 @@ $commandGet = $argv[1] ?? null;
 $cryptoGet = $argv[2] ?? null;
 $currencyGet = $argv[3] ?? null;
 $apiUrl = 'https://api.coinbase.com/v2/prices/' . $cryptoGet . '-' . $currencyGet . '/spot';
-$apiCurrency = 'https://api.coinbase.com/v2/currencies';
-$apiCryptoCurrency = 'https://api.coinbase.com/v2/currencies/crypto';
 
 function getApiData($api)
 {
@@ -24,18 +22,32 @@ function getApiData($api)
 }
 
 // GET Currencies
-$currencies = getApiData($apiCurrency);
-$currenciesList = [];
-foreach ($currencies['data'] as $currency) {
-    $currenciesList[] = $currency['id'];
+function currencyList()
+{
+    $api = 'https://api.coinbase.com/v2/currencies';
+    $currencies = getApiData($api);
+    $list = [];
+    foreach ($currencies['data'] as $currency) {
+        $list[] = $currency['id'];
+    }
+    return $list;
 }
 
+$currencies = currencyList();
+
 // GET Crypto Currencies
-$crypto = getApiData($apiCryptoCurrency);
-$cryptoList = [];
-foreach ($crypto['data'] as $cry) {
-    $cryptoList[] = $cry['code'];
+function cryptoList()
+{
+    $api = 'https://api.coinbase.com/v2/currencies/crypto';
+    $crypto = getApiData($api);
+    $list = [];
+    foreach ($crypto['data'] as $cry) {
+        $list[] = $cry['code'];
+    }
+    return $list;
 }
+
+$crypto = cryptoList();
 
 if ($commandGet === null && $commandGet !== 'price' && $commandGet !== 'list') {
     echo sprintf('Error message: Wrong first argument');
@@ -59,7 +71,7 @@ if ($commandGet === 'price') {
         die;
     }
 
-    if (in_array($cryptoGet, $cryptoList) === false || in_array($currencyGet, $currenciesList) === false) {
+    if (in_array($cryptoGet, $crypto) === false || in_array($currencyGet, $currencies) === false) {
         echo sprintf('Error message: Invalid crypto or currency token');
         die;
     }
@@ -75,6 +87,6 @@ if ($commandGet === 'price') {
 }
 
 if ($commandGet === 'list') {
-    $list = implode(', ', $cryptoList);
+    $list = implode(', ', $crypto);
     echo sprintf($list);
 }
