@@ -24,27 +24,9 @@ function verifyArg($cryptoGet, $currencyGet)
     }
 }
 
-function verifyData($cryptoGet, $currencyGet, $cryptoList, $currenciesList, $currencyPair)
-{
-    if ($currenciesList === false || $cryptoList === false) {
-        printHelpText('Error message: Unsupported token pair, empty or invalid .json file for currencies or crypto token list');
-        die;
-    };
-
-    if (in_array($cryptoGet, $cryptoList) === false || in_array($currencyGet, $currenciesList) === false) {
-        printHelpText('Error message: Invalid crypto or currency token');
-        die;
-    }
-
-    if ($currencyPair === false) {
-        printHelpText('Error message: Unsupported token pair, empty or invalid .json file for currencies pair');
-        die;
-    };
-}
-
 switch ($commandGet) {
     case 'help':
-        echo sprintf('Help text:' . "\n" . 'For crypto token list enter: \'list\'' . "\n" . 'For currency pair enter: \'price\' BTC USD');
+        printHelpText('Help text:' . "\n" . 'For crypto token list enter: \'list\'' . "\n" . 'For currency pair enter: \'price\' BTC USD');
         break;
     case 'list':
         $cryptoList = getListCrypto();
@@ -61,5 +43,5 @@ switch ($commandGet) {
         printPricePair($currencyPair);
         break;
     default:
-        echo ('Error message: Wrong first argument - valid arguments: help, price, list');
+        printHelpText('Error message: Wrong first argument - valid arguments: help, price, list');
 }

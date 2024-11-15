@@ -1,4 +1,21 @@
 <?php
+function verifyData($cryptoGet, $currencyGet, $cryptoList, $currenciesList, $currencyPair)
+{
+    if ($currenciesList === false || $cryptoList === false) {
+        printHelpText('Error message: Unsupported token pair, empty or invalid .json file for currencies or crypto token list');
+        die;
+    };
+
+    if (in_array($cryptoGet, $cryptoList) === false || in_array($currencyGet, $currenciesList) === false) {
+        printHelpText('Error message: Invalid crypto or currency token');
+        die;
+    }
+
+    if ($currencyPair === false) {
+        printHelpText('Error message: Unsupported token pair, empty or invalid .json file for currencies pair');
+        die;
+    };
+}
 
 function getApiData($api)
 {
