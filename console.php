@@ -28,20 +28,33 @@ switch ($commandGet) {
     case 'help':
         printHelpText('Help text:' . "\n" . 'For crypto token list enter: \'list\'' . "\n" . 'For currency pair enter: \'price\' BTC USD');
         break;
+
     case 'list':
-        $cryptoList = getListCrypto();
+        $cryptoList = getList('/crypto', 'code');
         printList($cryptoList);
         break;
+
     case 'price':
         verifyArg($cryptoGet, $currencyGet);
 
-        $currenciesList = getListCurrencies();
-        $cryptoList = getListCrypto();
-        $currencyPair = getCurrencyPair($cryptoGet, $currencyGet);
-        verifyData($cryptoGet, $currencyGet, $cryptoList, $currenciesList, $currencyPair);
+        $currenciesList = getList('', 'id');
+        $cryptoList = getList('/crypto', 'code');
 
-        printPricePair($currencyPair);
+        $verifyResult = verifyCurrencies($cryptoGet, $currencyGet, $cryptoList, $currenciesList);
+        if (($verifyResult['success']) === false) {
+            printHelpText($verifyResult['error']);
+            return;
+        }
+
+        $currencyPair = getCurrencyPair($cryptoGet, $currencyGet);
+        if (($currencyPair['success']) === false) {
+            printHelpText($currencyPair['error']);
+            return;
+        } else {
+            printPricePair($currencyPair);
+        }
         break;
+
     default:
         printHelpText('Error message: Wrong first argument - valid arguments: help, price, list');
 }
