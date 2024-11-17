@@ -6,55 +6,66 @@ $commandGet = $argv[1] ?? null;
 $cryptoGet = $argv[2] ?? null;
 $currencyGet = $argv[3] ?? null;
 
-function verifyArg($cryptoGet, $currencyGet)
+$view = new ConsoleView();
+
+function verifyArg(?string $cryptoGet, ?string $currencyGet, ConsoleView $view): void
 {
     if ($cryptoGet === null || $currencyGet === null) {
-        printHelpText('Error message: Argument cannot be null');
+        $view->printHelpText('Error message: Argument cannot be null');
         die;
     }
 
     if ((strlen($cryptoGet) < 3 || strlen($cryptoGet) > 10)) {
-        printHelpText('Error message: Wrong crypto token length');
+        $view->printHelpText('Error message: Wrong crypto token length');
         die;
     }
 
     if (strlen($currencyGet) !== 3) {
-        printHelpText('Error message: Wrong currency token length');
+        $view->printHelpText('Error message: Wrong currency token length');
         die;
     }
 }
 
-switch ($commandGet) {
-    case 'help':
-        printHelpText('Help text:' . "\n" . 'For crypto token list enter: \'list\'' . "\n" . 'For currency pair enter: \'price\' BTC USD');
-        break;
+$model = new Model();
 
-    case 'list':
-        $cryptoList = getList('/crypto', 'code');
-        printList($cryptoList);
-        break;
+function verifyResult(string $currency, ConsoleView $view, Model $model): void
+{
+    $verifyResult = $model->verifyCurrency($currency);
+    if (($verifyResult['success']) === false) {
+        $view->printHelpText($verifyResult['error']);
+        die;
+    }
+};
 
-    case 'price':
-        verifyArg($cryptoGet, $currencyGet);
+function finalOutput(?string $commandGet, ?string $cryptoGet, ?string $currencyGet, ConsoleView $view, Model $model): void
+{
+    switch ($commandGet) {
+        case 'help':
+            $view->printHelpText('Help text:' . "\n" . 'For crypto token list enter: \'list\'' . "\n" . 'For currency pair enter: \'price\' BTC USD');
+            break;
 
-        $currenciesList = getList('', 'id');
-        $cryptoList = getList('/crypto', 'code');
+        case 'list':
+            $list = $model->getList();
+            $view->printList($list);
+            break;
 
-        $verifyResult = verifyCurrencies($cryptoGet, $currencyGet, $cryptoList, $currenciesList);
-        if (($verifyResult['success']) === false) {
-            printHelpText($verifyResult['error']);
-            return;
-        }
+        case 'price':
+            verifyArg($cryptoGet, $currencyGet, $view);
+            verifyResult($currencyGet, $view, $model);
+            verifyResult($cryptoGet, $view, $model);
 
-        $currencyPair = getCurrencyPair($cryptoGet, $currencyGet);
-        if (($currencyPair['success']) === false) {
-            printHelpText($currencyPair['error']);
-            return;
-        } else {
-            printPricePair($currencyPair);
-        }
-        break;
+            $currencyPair = $model->getCurrencyPair($cryptoGet, $currencyGet);
+            if (($currencyPair['success']) === false) {
+                $view->printHelpText($currencyPair['error']);
+                die;
+            } else {
+                $view->printPricePair($currencyPair);
+            }
+            break;
 
-    default:
-        printHelpText('Error message: Wrong first argument - valid arguments: help, price, list');
+        default:
+            $view->printHelpText('Error message: Wrong first argument - valid arguments: help, price, list');
+    }
 }
+
+finalOutput($commandGet, $cryptoGet, $currencyGet, $view, $model);
