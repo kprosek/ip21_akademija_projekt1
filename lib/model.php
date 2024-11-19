@@ -2,6 +2,9 @@
 
 class Model
 {
+    private $listOfCurrencies = null;
+    private $apiUrl = 'https://api.coinbase.com/v2/';
+
     private function getApiData(string $api): array|false
     {
         $json = file_get_contents($api);
@@ -17,16 +20,13 @@ class Model
         return $dataArray;
     }
 
-    private $listOfCurrencies = null;
-
     public function getList(): array|false
     {
         if ($this->listOfCurrencies !== null) {
             return $this->listOfCurrencies;
         }
 
-        $apiCurrencies = 'https://api.coinbase.com/v2/currencies';
-        $listCurrencies = $this->getApiData($apiCurrencies);
+        $listCurrencies = $this->getApiData($this->apiUrl . 'currencies');
         if ($listCurrencies === false) {
             return $listCurrencies;
         }
@@ -36,8 +36,7 @@ class Model
             $list[] = $data['id'];
         }
 
-        $apiCrypto = 'https://api.coinbase.com/v2/currencies/crypto';
-        $listCrypto = $this->getApiData($apiCrypto);
+        $listCrypto = $this->getApiData($this->apiUrl . 'currencies/crypto');
         if ($listCrypto === false) {
             return $listCrypto;
         }
@@ -50,18 +49,16 @@ class Model
         return $list;
     }
 
-    public function verifyCurrency(string $currency): array
+    public function verifyCurrency(string $currency, array $listOfCurrenciesFromController): array
     {
-        $list = $this->getList();
-
-        if ($list === false) {
+        if ($listOfCurrenciesFromController === false) {
             return [
                 'success' => false,
                 'error' => 'Error message: Unsupported token pair, empty or invalid .json file'
             ];
         }
 
-        if (!in_array($currency, $list)) {
+        if (!in_array($currency, $listOfCurrenciesFromController)) {
             return [
                 'success' => false,
                 'error' => 'Error message: Invalid crypto or currency token'
@@ -73,15 +70,15 @@ class Model
 
     public function getCurrencyPair(string $cryptoGet, string $currencyGet): array
     {
-        $api = 'https://api.coinbase.com/v2/prices/' . $cryptoGet . '-' . $currencyGet . '/spot';
+        $api = $this->apiUrl . 'prices/' . $cryptoGet . '-' . $currencyGet . '/spot';
         $currencyPair = $this->getApiData($api);
         if ($currencyPair === false) {
             return [
                 'success' => false,
                 'error' => 'Error message: Unsupported token pair, empty or invalid .json file'
             ];
-        } else {
-            return $currencyPair;
         }
+
+        return $currencyPair;
     }
 }

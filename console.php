@@ -2,44 +2,44 @@
 require_once 'lib/model.php';
 require_once 'lib/views/consoleView.php';
 
-$commandGet = $argv[1] ?? null;
-$cryptoGet = $argv[2] ?? null;
-$currencyGet = $argv[3] ?? null;
+$command = $argv[1] ?? null;
+$crypto = $argv[2] ?? null;
+$currency = $argv[3] ?? null;
 
-$view = new ConsoleView();
-
-function verifyArg(?string $cryptoGet, ?string $currencyGet, ConsoleView $view): void
+function verifyArg(?string $crypto, ?string $currency, ConsoleView $view): void
 {
-    if ($cryptoGet === null || $currencyGet === null) {
+    if ($crypto === null || $currency === null) {
         $view->printHelpText('Error message: Argument cannot be null');
         die;
     }
 
-    if ((strlen($cryptoGet) < 3 || strlen($cryptoGet) > 10)) {
+    if ((strlen($crypto) < 3 || strlen($crypto) > 10)) {
         $view->printHelpText('Error message: Wrong crypto token length');
         die;
     }
 
-    if (strlen($currencyGet) !== 3) {
+    if (strlen($currency) !== 3) {
         $view->printHelpText('Error message: Wrong currency token length');
         die;
     }
 }
 
-$model = new Model();
-
-function verifyResult(string $currency, ConsoleView $view, Model $model): void
+function verifyCurrencyError(string $currency, ConsoleView $view, Model $model, array $listOfCurrenciesFromController): void
 {
-    $verifyResult = $model->verifyCurrency($currency);
-    if (($verifyResult['success']) === false) {
-        $view->printHelpText($verifyResult['error']);
+    $checkCurrency = $model->verifyCurrency($currency, $listOfCurrenciesFromController);
+    if (($checkCurrency['success']) === false) {
+        $view->printHelpText($checkCurrency['error']);
         die;
     }
 };
 
-function finalOutput(?string $commandGet, ?string $cryptoGet, ?string $currencyGet, ConsoleView $view, Model $model): void
+function finalOutput(?string $command, ?string $crypto, ?string $currency): void
 {
-    switch ($commandGet) {
+    $view = new ConsoleView();
+    $model = new Model();
+    $listOfCurrenciesFromController = $model->getList();
+
+    switch ($command) {
         case 'help':
             $view->printHelpText('Help text:' . "\n" . 'For crypto token list enter: \'list\'' . "\n" . 'For currency pair enter: \'price\' BTC USD');
             break;
@@ -50,17 +50,16 @@ function finalOutput(?string $commandGet, ?string $cryptoGet, ?string $currencyG
             break;
 
         case 'price':
-            verifyArg($cryptoGet, $currencyGet, $view);
-            verifyResult($currencyGet, $view, $model);
-            verifyResult($cryptoGet, $view, $model);
+            verifyArg($crypto, $currency, $view);
+            verifyCurrencyError($currency, $view, $model, $listOfCurrenciesFromController);
+            verifyCurrencyError($crypto, $view, $model, $listOfCurrenciesFromController);
 
-            $currencyPair = $model->getCurrencyPair($cryptoGet, $currencyGet);
+            $currencyPair = $model->getCurrencyPair($crypto, $currency);
             if (($currencyPair['success']) === false) {
                 $view->printHelpText($currencyPair['error']);
                 die;
-            } else {
-                $view->printPricePair($currencyPair);
             }
+            $view->printPricePair($currencyPair);
             break;
 
         default:
@@ -68,4 +67,4 @@ function finalOutput(?string $commandGet, ?string $cryptoGet, ?string $currencyG
     }
 }
 
-finalOutput($commandGet, $cryptoGet, $currencyGet, $view, $model);
+finalOutput($command, $crypto, $currency);
