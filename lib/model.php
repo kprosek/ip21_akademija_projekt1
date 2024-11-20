@@ -5,9 +5,9 @@ class Model
     private $listOfCurrencies = null;
     private $apiUrl = 'https://api.coinbase.com/v2/';
 
-    private function getApiData(string $api): array|false
+    private function getApiData(string $apiEndpoint): array|false
     {
-        $json = file_get_contents($api);
+        $json = file_get_contents($this->apiUrl . $apiEndpoint);
         if (empty($json)) {
             return false;
         }
@@ -26,7 +26,7 @@ class Model
             return $this->listOfCurrencies;
         }
 
-        $listCurrencies = $this->getApiData($this->apiUrl . 'currencies');
+        $listCurrencies = $this->getApiData('currencies');
         if ($listCurrencies === false) {
             return $listCurrencies;
         }
@@ -36,7 +36,7 @@ class Model
             $list[] = $data['id'];
         }
 
-        $listCrypto = $this->getApiData($this->apiUrl . 'currencies/crypto');
+        $listCrypto = $this->getApiData('currencies/crypto');
         if ($listCrypto === false) {
             return $listCrypto;
         }
@@ -49,16 +49,16 @@ class Model
         return $list;
     }
 
-    public function verifyCurrency(string $currency, array $listOfCurrenciesFromController): array
+    public function verifyCurrency(string $currency, array $masterCurrencyList): array
     {
-        if ($listOfCurrenciesFromController === false) {
+        if ($masterCurrencyList === false) {
             return [
                 'success' => false,
                 'error' => 'Error message: Unsupported token pair, empty or invalid .json file'
             ];
         }
 
-        if (!in_array($currency, $listOfCurrenciesFromController)) {
+        if (!in_array($currency, $masterCurrencyList)) {
             return [
                 'success' => false,
                 'error' => 'Error message: Invalid crypto or currency token'
@@ -70,7 +70,7 @@ class Model
 
     public function getCurrencyPair(string $cryptoGet, string $currencyGet): array
     {
-        $api = $this->apiUrl . 'prices/' . $cryptoGet . '-' . $currencyGet . '/spot';
+        $api = 'prices/' . $cryptoGet . '-' . $currencyGet . '/spot';
         $currencyPair = $this->getApiData($api);
         if ($currencyPair === false) {
             return [

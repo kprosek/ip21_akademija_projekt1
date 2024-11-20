@@ -24,9 +24,9 @@ function verifyArg(?string $crypto, ?string $currency, ConsoleView $view): void
     }
 }
 
-function verifyCurrencyError(string $currency, ConsoleView $view, Model $model, array $listOfCurrenciesFromController): void
+function isCurrencyInMasterList(string $currency, ConsoleView $view, Model $model, array $masterCurrencyList): void
 {
-    $checkCurrency = $model->verifyCurrency($currency, $listOfCurrenciesFromController);
+    $checkCurrency = $model->verifyCurrency($currency, $masterCurrencyList);
     if (($checkCurrency['success']) === false) {
         $view->printHelpText($checkCurrency['error']);
         die;
@@ -37,7 +37,7 @@ function finalOutput(?string $command, ?string $crypto, ?string $currency): void
 {
     $view = new ConsoleView();
     $model = new Model();
-    $listOfCurrenciesFromController = $model->getList();
+    $masterCurrencyList = $model->getList();
 
     switch ($command) {
         case 'help':
@@ -51,8 +51,8 @@ function finalOutput(?string $command, ?string $crypto, ?string $currency): void
 
         case 'price':
             verifyArg($crypto, $currency, $view);
-            verifyCurrencyError($currency, $view, $model, $listOfCurrenciesFromController);
-            verifyCurrencyError($crypto, $view, $model, $listOfCurrenciesFromController);
+            isCurrencyInMasterList($currency, $view, $model, $masterCurrencyList);
+            isCurrencyInMasterList($crypto, $view, $model, $masterCurrencyList);
 
             $currencyPair = $model->getCurrencyPair($crypto, $currency);
             if (($currencyPair['success']) === false) {
