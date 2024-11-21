@@ -1,17 +1,20 @@
 <?php
 
-function printList($list)
+class ConsoleView
 {
-    $list = implode(', ', $list);
-    echo ($list);
-}
+    public function printList(array $list): void
+    {
+        $list = implode(', ', $list);
+        echo ($list);
+    }
 
-function printPricePair($currencyPair)
-{
-    echo sprintf('%s: %.2f %s', $currencyPair['data']['base'], $currencyPair['data']['amount'], $currencyPair['data']['currency']);
-}
+    public function printPricePair(array $currencyPair): void
+    {
+        echo sprintf('%s: %.2f %s', $currencyPair['data']['base'], $currencyPair['data']['amount'], $currencyPair['data']['currency']);
+    }
 
-function printHelpText($text)
-{
-    echo ('Error message: ' . $text);
+    public function printHelpText(string $text): void
+    {
+        echo ('Error message: ' . $text);
+    }
 }

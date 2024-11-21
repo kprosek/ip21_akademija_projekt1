@@ -44,7 +44,7 @@ and I get message “Wrong currency token length”.
 
 ### 6 - Empty or invalid json for currencyPair, currenciesList or cryptoList
 Something is wrong with the fetched data 
-and I get message “Error message: Unsupported token pair, empty or invalid .json file for currencies or crypto token list”.
+and I get message “Error message: Unsupported token pair, empty or invalid .json file”.
 
 ### 7 - Incorrect crypto or currency token
 As a User I enter crypto or currency token that is not in the fetched list
@@ -53,13 +53,13 @@ and I get message “Invalid crypto or currency token”.
 
 ### 8 - Empty or invalid json for currencyPair
 Something is wrong with the fetched data 
-and I get message “Error message: Unsupported token pair, empty or invalid .json file for currencies pair”.
+and I get message “Error message: Unsupported token pair, empty or invalid .json file”.
 
 ## Edge cases
 
 ### 1 - Price: Wrong order of tokens
 As a User I enter switched order of crypto and currency tokens
-and I get message “Invalid crypto or currency token”.
+and I get values returned in human readable form.
 
 ### 2 - Price: Huge number of characters
 As a User I enter a 2nd or 3rd arg as 100+ characters

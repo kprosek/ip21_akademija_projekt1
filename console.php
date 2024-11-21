@@ -2,59 +2,69 @@
 require_once 'lib/model.php';
 require_once 'lib/views/consoleView.php';
 
-$commandGet = $argv[1] ?? null;
-$cryptoGet = $argv[2] ?? null;
-$currencyGet = $argv[3] ?? null;
+$command = $argv[1] ?? null;
+$crypto = $argv[2] ?? null;
+$currency = $argv[3] ?? null;
 
-function verifyArg($cryptoGet, $currencyGet)
+function verifyArg(?string $crypto, ?string $currency, ConsoleView $view): void
 {
-    if ($cryptoGet === null || $currencyGet === null) {
-        printHelpText('Error message: Argument cannot be null');
+    if ($crypto === null || $currency === null) {
+        $view->printHelpText('Error message: Argument cannot be null');
         die;
     }
 
-    if ((strlen($cryptoGet) < 3 || strlen($cryptoGet) > 10)) {
-        printHelpText('Error message: Wrong crypto token length');
+    if ((strlen($crypto) < 3 || strlen($crypto) > 10)) {
+        $view->printHelpText('Error message: Wrong crypto token length');
         die;
     }
 
-    if (strlen($currencyGet) !== 3) {
-        printHelpText('Error message: Wrong currency token length');
+    if (strlen($currency) !== 3) {
+        $view->printHelpText('Error message: Wrong currency token length');
         die;
     }
 }
 
-switch ($commandGet) {
-    case 'help':
-        printHelpText('Help text:' . "\n" . 'For crypto token list enter: \'list\'' . "\n" . 'For currency pair enter: \'price\' BTC USD');
-        break;
+function isCurrencyInMasterList(string $currency, ConsoleView $view, Model $model, array $masterCurrencyList): void
+{
+    $checkCurrency = $model->verifyCurrency($currency, $masterCurrencyList);
+    if (($checkCurrency['success']) === false) {
+        $view->printHelpText($checkCurrency['error']);
+        die;
+    }
+};
 
-    case 'list':
-        $cryptoList = getList('/crypto', 'code');
-        printList($cryptoList);
-        break;
+function finalOutput(?string $command, ?string $crypto, ?string $currency): void
+{
+    $view = new ConsoleView();
+    $model = new Model();
+    $masterCurrencyList = $model->getList();
 
-    case 'price':
-        verifyArg($cryptoGet, $currencyGet);
+    switch ($command) {
+        case 'help':
+            $view->printHelpText('Help text:' . "\n" . 'For crypto token list enter: \'list\'' . "\n" . 'For currency pair enter: \'price\' BTC USD');
+            break;
 
-        $currenciesList = getList('', 'id');
-        $cryptoList = getList('/crypto', 'code');
+        case 'list':
+            $list = $model->getList();
+            $view->printList($list);
+            break;
 
-        $verifyResult = verifyCurrencies($cryptoGet, $currencyGet, $cryptoList, $currenciesList);
-        if (($verifyResult['success']) === false) {
-            printHelpText($verifyResult['error']);
-            return;
-        }
+        case 'price':
+            verifyArg($crypto, $currency, $view);
+            isCurrencyInMasterList($currency, $view, $model, $masterCurrencyList);
+            isCurrencyInMasterList($crypto, $view, $model, $masterCurrencyList);
 
-        $currencyPair = getCurrencyPair($cryptoGet, $currencyGet);
-        if (($currencyPair['success']) === false) {
-            printHelpText($currencyPair['error']);
-            return;
-        } else {
-            printPricePair($currencyPair);
-        }
-        break;
+            $currencyPair = $model->getCurrencyPair($crypto, $currency);
+            if (($currencyPair['success']) === false) {
+                $view->printHelpText($currencyPair['error']);
+                die;
+            }
+            $view->printPricePair($currencyPair);
+            break;
 
-    default:
-        printHelpText('Error message: Wrong first argument - valid arguments: help, price, list');
+        default:
+            $view->printHelpText('Error message: Wrong first argument - valid arguments: help, price, list');
+    }
 }
+
+finalOutput($command, $crypto, $currency);
