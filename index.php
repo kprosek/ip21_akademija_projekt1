@@ -7,8 +7,6 @@ $loader = new \Twig\Loader\FilesystemLoader('lib/views/web');
 $twig = new \Twig\Environment($loader, [
 ]);
 
-// echo $twig->render('index.html.twig', ['name' => 'Klara']);
-
 $list = ['items' => $model->getList()];
 
 echo $twig->render('list.html.twig', $list);
