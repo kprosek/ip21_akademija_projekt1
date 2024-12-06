@@ -46,7 +46,24 @@ function finalOutput(?string $command, ?string $crypto, ?string $currency): void
 
         case 'list':
             $list = $model->getList();
+
             $view->printList($list);
+
+            $ifSaveUserFavouriteTokens = readline("Do you wish to mark any as favorite? (y/n)");
+
+            $savedUserTokens = [];
+            if ($ifSaveUserFavouriteTokens === "y") {
+                $saveUsersFavouriteTokens = readline("Please enter the number in front of the currency you wish to favorite:");
+                $savedUserTokenKeys = explode(',', $saveUsersFavouriteTokens);
+                foreach ($savedUserTokenKeys as $key) {
+                    if (array_key_exists($key, $list) === false) {
+                        $view->printHelpText('You entered a wrong number. Marking token as favourite was not successful');
+                        die;
+                    }
+                    $savedUserTokens[] = $list[$key];
+                }
+            }
+            var_dump($savedUserTokens);
             break;
 
         case 'price':

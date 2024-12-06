@@ -31,22 +31,27 @@ class Model
             return $listCurrencies;
         }
 
-        $list = [];
-        foreach ($listCurrencies['data'] as $data) {
-            $list[] = $data['id'];
-        }
-
         $listCrypto = $this->getApiData('currencies/crypto');
         if ($listCrypto === false) {
             return $listCrypto;
+        }
+
+        $list = [];
+        foreach ($listCurrencies['data'] as $data) {
+            $list[] = $data['id'];
         }
 
         foreach ($listCrypto['data'] as $data) {
             $list[] = $data['code'];
         }
 
-        $this->listOfCurrencies = $list;
-        return $list;
+        $listOfOrderedTokens =  [];
+        foreach ($list as $index => $token) {
+            $listOfOrderedTokens[$index + 1] = $token;
+        }
+
+        $this->listOfCurrencies = $listOfOrderedTokens;
+        return $listOfOrderedTokens;
     }
 
     public function verifyCurrency(string $currency, array $masterCurrencyList): array
