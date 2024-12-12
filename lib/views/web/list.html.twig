@@ -3,14 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>List of Currencies</title>
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="../../css/style.css">
 </head>
 <body>
-    <h1>List of All Currency Tokens</h1>
+<h1>All Currency Tokens</h1>
+
+{% include 'header.html.twig' with {favourites: favourites} %}
+
+<h2>List of All Curreny Tokens: </h2>
         <ul>
         {% for item in items %}
             <li>{{ item }}</li>
         {% endfor %}
-    </ul>
+        </ul>
 </body>
 </html>

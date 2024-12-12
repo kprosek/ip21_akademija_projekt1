@@ -31,22 +31,27 @@ class Model
             return $listCurrencies;
         }
 
-        $list = [];
-        foreach ($listCurrencies['data'] as $data) {
-            $list[] = $data['id'];
-        }
-
         $listCrypto = $this->getApiData('currencies/crypto');
         if ($listCrypto === false) {
             return $listCrypto;
+        }
+
+        $list = [];
+        foreach ($listCurrencies['data'] as $data) {
+            $list[] = $data['id'];
         }
 
         foreach ($listCrypto['data'] as $data) {
             $list[] = $data['code'];
         }
 
-        $this->listOfCurrencies = $list;
-        return $list;
+        $listOfOrderedTokens =  [];
+        foreach ($list as $index => $token) {
+            $listOfOrderedTokens[$index + 1] = $token;
+        }
+
+        $this->listOfCurrencies = $listOfOrderedTokens;
+        return $listOfOrderedTokens;
     }
 
     public function verifyCurrency(string $currency, array $masterCurrencyList): array
@@ -80,5 +85,64 @@ class Model
         }
 
         return $currencyPair;
+    }
+
+    public function databaseConnection()
+    {
+        $env = parse_ini_file('.env');
+
+        $host = $env['DB_HOST'];
+        $port = $env['DB_PORT'];
+        $dbname = $env['DB_DATABASE'];
+        $user = 'root';
+        $password = $env['DB_PASSWORD'];
+
+        $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=UTF8";
+        $pdo = new PDO($dsn, $user, $password);
+        return $pdo;
+    }
+
+    // Temp solution for Web - different .env path
+    public function databaseConnectionWeb()
+    {
+        $env = parse_ini_file('../.env');
+
+        $host = $env['DB_HOST'];
+        $port = $env['DB_PORT'];
+        $dbname = $env['DB_DATABASE'];
+        $user = 'root';
+        $password = $env['DB_PASSWORD'];
+
+        $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=UTF8";
+        $pdo = new PDO($dsn, $user, $password);
+        return $pdo;
+    }
+
+    public function insertFavouriteTokens($pdo, $tokens)
+    {
+        $sql = "INSERT INTO favourites (token_name) VALUES (:token_name) ON DUPLICATE KEY UPDATE token_name = :token_name";
+        $stmt = $pdo->prepare($sql);
+
+        foreach ($tokens as $token) {
+            $stmt->execute([':token_name' => $token]);
+        }
+    }
+
+    public function displayFavouriteTokens($pdo)
+    {
+        $data = $pdo->query("SELECT * FROM favourites")->fetchAll();
+        $userFavouriteTokens = [];
+        foreach ($data as $row) {
+            $userFavouriteTokens[] = $row['token_name'];
+        }
+        return $userFavouriteTokens;
+    }
+
+    public function deleteFavouriteTokens($pdo, $tokens)
+    {
+        $placeholders = implode(',', array_fill(0, count($tokens), '?'));
+        $sql = "DELETE FROM favourites WHERE token_name IN ($placeholders)";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($tokens);
     }
 }

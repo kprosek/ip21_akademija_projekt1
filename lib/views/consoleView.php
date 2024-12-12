@@ -4,8 +4,9 @@ class ConsoleView
 {
     public function printList(array $list): void
     {
-        $list = implode(', ', $list);
-        echo ($list);
+        foreach ($list as $key => $token) {
+            echo ($key . ' ' . $token . "\n");
+        }
     }
 
     public function printPricePair(array $currencyPair): void
@@ -15,6 +16,11 @@ class ConsoleView
 
     public function printHelpText(string $text): void
     {
-        echo ('Error message: ' . $text);
+        echo ($text);
+    }
+
+    public function printFavouriteTokens(string $text): void
+    {
+        echo ("This are your favourite tokens: " . "\n" . $text);
     }
 }
