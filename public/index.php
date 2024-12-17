@@ -5,7 +5,7 @@ $model = new Model();
 
 $loader = new \Twig\Loader\FilesystemLoader('../lib/views/web');
 $twig = new \Twig\Environment($loader, []);
-$pdo = $model->databaseConnectionWeb();
+$pdo = $model->databaseConnection('../');
 
 $list = $model->getList();
 $favourites = $model->displayFavouriteTokens($pdo);

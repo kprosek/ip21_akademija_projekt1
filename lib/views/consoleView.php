@@ -5,7 +5,7 @@ class ConsoleView
     public function printList(array $list): void
     {
         foreach ($list as $key => $token) {
-            echo ($key . ' ' . $token . "\n");
+            echo $key . ' ' . $token . PHP_EOL;
         }
     }
 
@@ -16,11 +16,11 @@ class ConsoleView
 
     public function printHelpText(string $text): void
     {
-        echo ($text);
+        echo $text;
     }
 
     public function printFavouriteTokens(string $text): void
     {
-        echo ("This are your favourite tokens: " . "\n" . $text);
+        echo PHP_EOL . "This are your favourite tokens: " . PHP_EOL . $text . PHP_EOL;
     }
 }

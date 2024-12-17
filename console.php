@@ -38,11 +38,11 @@ function finalOutput(?string $command, ?string $crypto, ?string $currency): void
     $view = new ConsoleView();
     $model = new Model();
     $masterCurrencyList = $model->getList();
-    $pdo = $model->databaseConnection();
+    $pdo = $model->databaseConnection('');
 
     switch ($command) {
         case 'help':
-            $view->printHelpText('How to use:' . "\n" . '1. For crypto token list and marking Favourites enter: \'list\'' . "\n" . '2. To view Favourites enter: \'crypto\'' . "\n" . '3. To delete Favourite enter: \'delete\'' . "\n" . '4. For currency pair enter: \'price\' BTC USD');
+            $view->printHelpText('How to use:' . PHP_EOL . '1. For crypto token list and marking Favourites enter: \'list\'' . PHP_EOL . '2. To view Favourites enter: \'crypto\'' . PHP_EOL . '3. To delete Favourite enter: \'delete\'' . PHP_EOL . '4. For currency pair enter: \'price\' BTC USD');
             break;
 
         case 'list':
@@ -50,12 +50,16 @@ function finalOutput(?string $command, ?string $crypto, ?string $currency): void
 
             $view->printList($list);
 
+            $favourites = implode(PHP_EOL, $model->displayFavouriteTokens($pdo));
+            $view->printFavouriteTokens($favourites);
+
             $ifSaveUserFavouriteTokens = readline('Do you wish to mark any as favorite? (y/n)');
 
             $savedUserTokens = [];
             if ($ifSaveUserFavouriteTokens === 'y') {
-                $saveUsersFavouriteTokens = readline('Please enter the number in front of the currency you wish to favorite: ');
+                $saveUsersFavouriteTokens = str_replace(' ', '', readline('Please enter the number in front of the currency you wish to favorite: '));
                 $savedUserTokenKeys = explode(',', $saveUsersFavouriteTokens);
+
                 foreach ($savedUserTokenKeys as $key) {
                     if (array_key_exists($key, $list) === false) {
                         $view->printHelpText('You entered a wrong number. Marking token as favourite was not successful');
@@ -68,15 +72,10 @@ function finalOutput(?string $command, ?string $crypto, ?string $currency): void
             }
             break;
 
-        case 'crypto':
-            $favourites = implode("\n", $model->displayFavouriteTokens($pdo));
-            $view->printFavouriteTokens($favourites);
-            break;
-
         case 'delete':
             $ifDeleteUserFavouriteTokens = readline('Do you wish to remove a token from favorites? (y/n)');
             if ($ifDeleteUserFavouriteTokens === 'y') {
-                $deleteUserFavouriteTokens = readline('Please enter the token you wish to delete: ');
+                $deleteUserFavouriteTokens = str_replace(' ', '', readline('Please enter the token you wish to delete: '));
                 $deleteUserTokens = explode(',', $deleteUserFavouriteTokens);
                 $model->deleteFavouriteTokens($pdo, $deleteUserTokens);
                 $view->printHelpText('Favourite tokens removed!');

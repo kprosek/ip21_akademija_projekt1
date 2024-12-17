@@ -87,25 +87,9 @@ class Model
         return $currencyPair;
     }
 
-    public function databaseConnection()
+    public function databaseConnection($path)
     {
-        $env = parse_ini_file('.env');
-
-        $host = $env['DB_HOST'];
-        $port = $env['DB_PORT'];
-        $dbname = $env['DB_DATABASE'];
-        $user = 'root';
-        $password = $env['DB_PASSWORD'];
-
-        $dsn = "mysql:host=$host;port=$port;dbname=$dbname;charset=UTF8";
-        $pdo = new PDO($dsn, $user, $password);
-        return $pdo;
-    }
-
-    // Temp solution for Web - different .env path
-    public function databaseConnectionWeb()
-    {
-        $env = parse_ini_file('../.env');
+        $env = parse_ini_file($path . '.env');
 
         $host = $env['DB_HOST'];
         $port = $env['DB_PORT'];
