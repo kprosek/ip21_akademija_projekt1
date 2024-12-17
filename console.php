@@ -90,9 +90,10 @@ function finalOutput(?string $command, ?string $crypto, ?string $currency): void
             $currencyPair = $model->getCurrencyPair($crypto, $currency);
             if (($currencyPair['success']) === false) {
                 $view->printHelpText($currencyPair['error']);
-                die;
             }
-            $view->printPricePair($currencyPair);
+            if (($currencyPair['success']) === true) {
+                $view->printPricePair($currencyPair['currency pair']);
+            }
             break;
 
         default:

@@ -84,7 +84,10 @@ class Model
             ];
         }
 
-        return $currencyPair;
+        return [
+            'success' => true,
+            'currency pair' => $currencyPair
+        ];
     }
 
     public function databaseConnection($path)
