@@ -10,4 +10,4 @@ $pdo = $model->databaseConnection('../');
 $list = $model->getList();
 $favourites = $model->displayFavouriteTokens($pdo);
 
-echo $twig->render('list.html.twig', ['favourites' => $favourites, 'items' => $list]);
+echo $twig->render('home.html.twig', ['favourites' => $favourites, 'items' => $list]);
