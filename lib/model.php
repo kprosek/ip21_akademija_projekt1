@@ -40,10 +40,12 @@ class Model
         foreach ($listCurrencies['data'] as $data) {
             $list[] = $data['id'];
         }
+        asort($list);
 
         foreach ($listCrypto['data'] as $data) {
             $list[] = $data['code'];
         }
+        asort($list);
 
         $listOfOrderedTokens =  [];
         foreach ($list as $index => $token) {
@@ -131,5 +133,12 @@ class Model
         $sql = "DELETE FROM favourites WHERE token_name IN ($placeholders)";
         $stmt = $pdo->prepare($sql);
         $stmt->execute($tokens);
+    }
+
+    public function isTokenFavourite($token, $favourites)
+    {
+        if (in_array($token, $favourites)) {
+            return 'fa-solid';
+        };
     }
 }

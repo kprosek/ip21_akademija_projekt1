@@ -1,25 +1,10 @@
 {% extends 'layout.html.twig' %}
 
-{% block favourites %}
-<section class="section-main favourites">
-    <section class="section-title">
-        <i class="fa-regular fa-star"></i>
-        <h2>Favourites</h2>
-    </section>
-
-    <section class="list-favourites">
-        <ul>
-            {% for fav in favourites %}
-                <li>{{ fav }}</li>
-            {% endfor %}
-        </ul>
-    </section>
-</section>
-{% endblock %}
-
 {% block price %}
+{% if price is defined %}
 <section class="section-show-price">
     <p class="text-token-price">Current Token value:</p>
     <p class="text-token-price">1 {{ token_from }} = {{ price }} {{ token_to }}</p>
 </section>
+{% endif %}
 {% endblock %}

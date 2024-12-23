@@ -10,4 +10,8 @@ $pdo = $model->databaseConnection('../');
 $list = $model->getList();
 $favourites = $model->displayFavouriteTokens($pdo);
 
-echo $twig->render('home.html.twig', ['favourites' => $favourites, 'items' => $list]);
+$dropdownList = array_merge($favourites, array_filter($list, function ($value) use ($favourites) {
+    return !in_array($value, $favourites);
+}));
+
+echo $twig->render('price.html.twig', ['favourites' => $favourites, 'items' => $dropdownList]);

@@ -12,30 +12,51 @@
 </header>
 
 <main>
-    {% block favourites %}    
-    {% endblock %}   
+<section class="section-main favourites">
+    <section class="section-title">
+        <i class="fa-regular fa-star"></i>
+        <h2>Favourites</h2>
+    </section>
+
+    <section class="list-favourites">
+        <ul>
+            {% for fav in favourites %}
+                <li>{{ fav }}</li>
+            {% endfor %}
+        </ul>
+    </section>
+</section>  
 
 <section class="section-main list">
     <section class="section-title">
         <i class="fa-solid fa-list"></i>
         <h2>Tokens</h2>
     </section>
-    <form action="show-price.php" method="get" class="section-select-tokens">
+  
+    <form action="show-price.php" method="get" class="form-select-tokens">
         <label id="dropdown_token_from">from</label>
+    <section class="section-select-token">
+        <button class="btn-favourite" name="btn_from" type="submit" formmethod="post"><i class="{{star_class_from|default('fa-regular')}} fa-star icon-favourite"></i></button>
         <select name="dropdown_token_from">
             {% for item in items %}
-                <option {% if item == token_from %}selected{% endif %}>{{ item }}</option>
+                <option {% if item == token_from %}selected{% endif %}>{{ item }} {% if item in favourites %}*{% endif %}</option>
             {% endfor %}
         </select>
+    </section>
+
         <label id="dropdown_token_to">to</label>
+    <section class="section-select-token">
+        <button class="btn-favourite" name="btn_to" type="submit" formmethod="post"><i class="{{star_class_to|default('fa-regular')}} fa-star icon-favourite"></i></button>
         <select name="dropdown_token_to">
             {% for item in items %}
-                <option {% if item == token_to %}selected{% endif %}>{{ item }}</option>
+                <option {% if item == token_to %}selected{% endif %} >{{ item }} {% if item in favourites %}*{% endif %}</option>
             {% endfor %}
         </select>
 
-        <button class="btn-price"><i class="fa-solid fa-magnifying-glass"></i>Show Price</button>
+    </section>
+        <button class="btn-price" type="submit"><i class="fa-solid fa-magnifying-glass"></i>Show Price</button>
     </form>
+
     {% block price %}
     {% endblock %}
     {% block error %}

@@ -42,7 +42,7 @@ function finalOutput(?string $command, ?string $crypto, ?string $currency): void
 
     switch ($command) {
         case 'help':
-            $view->printHelpText('How to use:' . PHP_EOL . '1. For crypto token list and marking Favourites enter: \'list\'' . PHP_EOL . '2. To view Favourites enter: \'crypto\'' . PHP_EOL . '3. To delete Favourite enter: \'delete\'' . PHP_EOL . '4. For currency pair enter: \'price\' BTC USD');
+            $view->printHelpText('How to use:' . PHP_EOL . '1. For crypto token list and marking Favourites enter: \'list\'' . PHP_EOL . '2. To delete Favourite enter: \'delete\'' . PHP_EOL . '3. For currency pair enter: \'price\' BTC USD');
             break;
 
         case 'list':
