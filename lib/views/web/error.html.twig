@@ -1,5 +1,7 @@
 {% extends 'layout.html.twig' %}
 
 {% block error %}
-<p class="text-error">Something went wrong, please try again!</p>
+ {% if error is defined %}
+<p class="text-error">{{error}}</p>
+{% endif %}
 {% endblock %}

@@ -18,8 +18,14 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
     $tokenTo = trim($_GET['dropdown_token_to'], ' *');
     $currencyPair = $model->getCurrencyPair($tokenFrom, $tokenTo);
 
+    if ($tokenFrom === 'Select:' || $tokenTo === 'Select:') {
+        echo $twig->render('error.html.twig', ['favourites' => $favourites, 'items' => $dropdownList, 'token_from' => $tokenFrom, 'token_to' => $tokenTo, 'star_class_from' => 'hidden', 'star_class_to' => 'hidden', 'error' => 'Please choose tokens!']);
+        die;
+    }
+
     if (($currencyPair['success']) === false) {
-        echo $twig->render('error.html.twig', ['items' => $list, 'token_from' => $tokenFrom, 'token_to' => $tokenTo]);
+        echo $twig->render('error.html.twig', ['favourites' => $favourites, 'items' => $dropdownList, 'token_from' => $tokenFrom, 'token_to' => $tokenTo, 'star_class_from' => 'hidden', 'star_class_to' => 'hidden', 'error' => 'Something went wrong, please try again!']);
+        die;
     }
 
     if (($currencyPair['success']) === true) {
@@ -27,19 +33,28 @@ if ($_SERVER["REQUEST_METHOD"] === "GET") {
         $btnTo = $model->isTokenFavourite($tokenTo, $favourites);
 
         $currentPrice = round($currencyPair["currency pair"]["data"]["amount"], 3);
-        echo $twig->render('price.html.twig', ['favourites' => $favourites, 'items' => $list, 'token_from' => $tokenFrom, 'price' => $currentPrice, 'token_to' => $tokenTo, 'star_class_from' => $btnFrom, 'star_class_to' => $btnTo]);
+        echo $twig->render('price.html.twig', ['favourites' => $favourites, 'items' => $dropdownList, 'token_from' => $tokenFrom, 'price' => $currentPrice, 'token_to' => $tokenTo, 'star_class_from' => $btnFrom, 'star_class_to' => $btnTo]);
     }
 }
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $tokenTo = trim($_POST['dropdown_token_to'], ' *');
     $tokenFrom = trim($_POST['dropdown_token_from'], ' *');
-    $currencyPair = $model->getCurrencyPair($tokenFrom, $tokenTo);
     $toggleTokenFav = [];
     $btn = "";
 
     $btnFrom = $model->isTokenFavourite($tokenFrom, $favourites);
     $btnTo = $model->isTokenFavourite($tokenTo, $favourites);
+
+    if ($tokenFrom === 'Select:') {
+        echo $twig->render('error.html.twig', ['favourites' => $favourites, 'items' => $dropdownList, 'token_from' => $tokenFrom, 'token_to' => $tokenTo, 'error' => 'Please choose token to mark as Favourite!']);
+        die;
+    }
+
+    if ($tokenTo === 'Select:') {
+        echo $twig->render('error.html.twig', ['favourites' => $favourites, 'items' => $dropdownList, 'token_from' => $tokenFrom, 'token_to' => $tokenTo, 'error' => 'Please choose token to mark as Favourite!']);
+        die;
+    }
 
     if (isset($_POST['btn_from'])) {
         $toggleTokenFav[] = $tokenFrom;
@@ -57,12 +72,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if ($btn === 'btn_from') {
             $btnFrom = 'fa-regular';
-            echo $twig->render('price.html.twig', ['favourites' => $updatedFavourites, 'items' => $list, 'token_from' => $tokenFrom, 'token_to' => $tokenTo, 'star_class_from' => $btnFrom, 'star_class_to' => $btnTo]);
+            echo $twig->render('price.html.twig', ['favourites' => $updatedFavourites, 'items' => $dropdownList, 'token_from' => $tokenFrom, 'token_to' => $tokenTo, 'star_class_from' => $btnFrom, 'star_class_to' => $btnTo]);
         }
 
         if ($btn === 'btn_to') {
             $btnTo = 'fa-regular';
-            echo $twig->render('price.html.twig', ['favourites' => $updatedFavourites, 'items' => $list, 'token_from' => $tokenFrom, 'token_to' => $tokenTo, 'star_class_from' => $btnFrom, 'star_class_to' => $btnTo]);
+            echo $twig->render('price.html.twig', ['favourites' => $updatedFavourites, 'items' => $dropdownList, 'token_from' => $tokenFrom, 'token_to' => $tokenTo, 'star_class_from' => $btnFrom, 'star_class_to' => $btnTo]);
         }
     }
 
@@ -72,12 +87,12 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         if ($btn === 'btn_from') {
             $btnFrom = 'fa-solid';
-            echo $twig->render('price.html.twig', ['favourites' => $updatedFavourites, 'items' => $list, 'token_from' => $tokenFrom, 'token_to' => $tokenTo, 'star_class_from' => $btnFrom, 'star_class_to' => $btnTo]);
+            echo $twig->render('price.html.twig', ['favourites' => $updatedFavourites, 'items' => $dropdownList, 'token_from' => $tokenFrom, 'token_to' => $tokenTo, 'star_class_from' => $btnFrom, 'star_class_to' => $btnTo]);
         }
 
         if ($btn === 'btn_to') {
             $btnTo = 'fa-solid';
-            echo $twig->render('price.html.twig', ['favourites' => $updatedFavourites, 'items' => $list, 'token_from' => $tokenFrom, 'token_to' => $tokenTo, 'star_class_from' => $btnFrom, 'star_class_to' => $btnTo]);
+            echo $twig->render('price.html.twig', ['favourites' => $updatedFavourites, 'items' => $dropdownList, 'token_from' => $tokenFrom, 'token_to' => $tokenTo, 'star_class_from' => $btnFrom, 'star_class_to' => $btnTo]);
         }
     }
 }
