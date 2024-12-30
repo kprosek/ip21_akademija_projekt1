@@ -36,9 +36,12 @@
     <form action="show-price.php" method="get" class="form-select-tokens">
         <label id="dropdown_token_from">from</label>
     <section class="section-select-token">
-        <button class="btn-favourite" name="btn_from" type="submit" formmethod="post"><i class="{{star_class_from|default('fa-regular')}} fa-star icon-favourite"></i></button>
-        <select name="dropdown_token_from">
-        <option selected>Select:</option>
+        <button class="btn-favourite" name="btn_from" type="submit" formmethod="post">
+            {% block favourite_from%}
+            {% endblock %}
+        </button>
+        <select name="dropdown_token_from" required>
+        <option disabled selected value="">Select:</option>
             {% for item in items %}
                 <option {% if item == token_from %}selected{% endif %}>{{ item }} {% if item in favourites %}*{% endif %}</option>
             {% endfor %}
@@ -47,9 +50,12 @@
 
         <label id="dropdown_token_to">to</label>
     <section class="section-select-token">
-        <button class="btn-favourite" name="btn_to" type="submit" formmethod="post"><i class="{{star_class_to|default('fa-regular')}} fa-star icon-favourite"></i></button>
-        <select name="dropdown_token_to">
-        <option selected>Select:</option>
+        <button class="btn-favourite" name="btn_to" type="submit" formmethod="post">
+            {% block favourite_to%}
+            {% endblock %}
+        </button>
+        <select name="dropdown_token_to" required>
+        <option disabled selected value="">Select:</option>
             {% for item in items %}
                 <option {% if item == token_to %}selected{% endif %} >{{ item }} {% if item in favourites %}*{% endif %}</option>
             {% endfor %}

@@ -14,4 +14,4 @@ $dropdownList = array_merge($favourites, array_filter($list, function ($value) u
     return !in_array($value, $favourites);
 }));
 
-echo $twig->render('home.html.twig', ['favourites' => $favourites, 'items' => $dropdownList, 'star_class_from' => 'hidden', 'star_class_to' => 'hidden']);
+echo $twig->render('home.html.twig', ['favourites' => $favourites, 'items' => $dropdownList]);

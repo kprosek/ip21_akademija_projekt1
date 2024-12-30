@@ -137,8 +137,10 @@ class Model
 
     public function isTokenFavourite($token, $favourites)
     {
-        if (in_array($token, $favourites)) {
-            return 'fa-solid';
+        if (!in_array($token, $favourites)) {
+            return false;
         };
+
+        return true;
     }
 }

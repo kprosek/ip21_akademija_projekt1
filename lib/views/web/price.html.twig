@@ -1,10 +1,24 @@
 {% extends 'layout.html.twig' %}
 
+{% block favourite_from %}
+    <i class="{{ star_class_from ? 'fa-solid' : 'fa-regular'}} fa-star icon-favourite"></i>
+{% endblock %}
+
+{% block favourite_to %}
+    <i class="{{ star_class_to ? 'fa-solid' : 'fa-regular' }} fa-star icon-favourite"></i>
+{% endblock %}
+
 {% block price %}
-{% if price is defined %}
-<section class="section-show-price">
-    <p class="text-token-price">Current Token value:</p>
-    <p class="text-token-price">1 {{ token_from }} = {{ price }} {{ token_to }}</p>
-</section>
-{% endif %}
+    {% if price is not null %}
+    <section class="section-show-price">
+        <p class="text-token-price">Current Token value:</p>
+        <p class="text-token-price">1 {{ token_from }} = {{ price }} {{ token_to }}</p>
+    </section>
+    {% endif %}
+{% endblock %}
+
+{% block error %}
+    {% if error is not null %}
+        <p class="text-error">{{error}}</p>
+    {% endif %}
 {% endblock %}
