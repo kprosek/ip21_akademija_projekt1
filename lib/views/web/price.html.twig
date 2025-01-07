@@ -1,11 +1,15 @@
 {% extends 'layout.html.twig' %}
 
 {% block favourite_from %}
-    <i class="{{ star_class_from ? 'fa-solid' : 'fa-regular'}} fa-star icon-favourite"></i>
+    {% if is_logged_in %}
+        <i class="{{ star_class_from ? 'fa-solid' : 'fa-regular'}} fa-star icon-favourite fa-lg"></i>
+    {% endif %}
 {% endblock %}
 
 {% block favourite_to %}
-    <i class="{{ star_class_to ? 'fa-solid' : 'fa-regular' }} fa-star icon-favourite"></i>
+    {% if is_logged_in %}
+        <i class="{{ star_class_to ? 'fa-solid' : 'fa-regular' }} fa-star icon-favourite fa-lg"></i>
+    {% endif %}
 {% endblock %}
 
 {% block price %}

@@ -8,10 +8,24 @@
 </head>
 <body>
 <header>
-    <h1>Currency Tokens</h1>
+    {% if is_logged_in %}
+    <section class="section-logout">
+        <p>Logged in with {{ user }}</p>
+        <a class="btn-logout" href="/logout.php">Logout</a>
+    </section>
+    {% else %}    
+    <section class="section-login">
+        <a class="btn-login" href="/login.php">Login</a>
+    </section>
+    {% endif %}
+
+    <section class="header-page">
+        <h1>Currency Tokens</h1>
+    </section>
 </header>
 
 <main>
+{% if is_logged_in %}
 <section class="section-main favourites">
     <section class="section-title">
         <i class="fa-regular fa-star"></i>
@@ -25,7 +39,8 @@
             {% endfor %}
         </ul>
     </section>
-</section>  
+</section>
+{% endif %}
 
 <section class="section-main list">
     <section class="section-title">
@@ -36,7 +51,7 @@
     <form action="show-price.php" method="get" class="form-select-tokens">
         <label id="dropdown_token_from">from</label>
     <section class="section-select-token">
-        <button class="btn-favourite" name="btn_from" type="submit" formmethod="post">
+        <button class="btn btn-favourite" name="btn_from" type="submit" formmethod="post">
             {% block favourite_from%}
             {% endblock %}
         </button>
@@ -50,7 +65,7 @@
 
         <label id="dropdown_token_to">to</label>
     <section class="section-select-token">
-        <button class="btn-favourite" name="btn_to" type="submit" formmethod="post">
+        <button class="btn btn-favourite" name="btn_to" type="submit" formmethod="post">
             {% block favourite_to%}
             {% endblock %}
         </button>
@@ -62,7 +77,7 @@
         </select>
 
     </section>
-        <button class="btn-price" type="submit"><i class="fa-solid fa-magnifying-glass"></i>Show Price</button>
+        <button class="btn btn-price" type="submit"><i class="fa-solid fa-magnifying-glass"></i>Show Price</button>
     </form>
 
     {% block price %}

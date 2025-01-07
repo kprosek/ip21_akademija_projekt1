@@ -48,8 +48,10 @@ class Model
         asort($list);
 
         $listOfOrderedTokens =  [];
+        $currentIndex = 1;
         foreach ($list as $index => $token) {
-            $listOfOrderedTokens[$index + 1] = $token;
+            $listOfOrderedTokens[$currentIndex] = $token;
+            $currentIndex += 1;
         }
 
         $this->listOfCurrencies = $listOfOrderedTokens;
@@ -61,14 +63,14 @@ class Model
         if ($masterCurrencyList === false) {
             return [
                 'success' => false,
-                'error' => 'Error message: Unsupported token pair, empty or invalid .json file'
+                'error' => 'Error: Unsupported token pair, empty or invalid .json file'
             ];
         }
 
         if (!in_array($currency, $masterCurrencyList)) {
             return [
                 'success' => false,
-                'error' => 'Error message: Invalid crypto or currency token'
+                'error' => 'Error: Invalid crypto or currency token'
             ];
         }
 
@@ -82,7 +84,7 @@ class Model
         if ($currencyPair === false) {
             return [
                 'success' => false,
-                'error' => 'Error message: Unsupported token pair, empty or invalid .json file'
+                'error' => 'Error: Unsupported token pair, empty or invalid .json file'
             ];
         }
 
@@ -92,7 +94,7 @@ class Model
         ];
     }
 
-    public function databaseConnection($path)
+    public function databaseConnection(string $path)
     {
         $env = parse_ini_file($path . '.env');
 
@@ -107,40 +109,154 @@ class Model
         return $pdo;
     }
 
-    public function insertFavouriteTokens($pdo, $tokens)
+    public function insertFavouriteTokens(PDO $pdo, string $userId, array $tokens)
     {
-        $sql = "INSERT INTO favourites (token_name) VALUES (:token_name) ON DUPLICATE KEY UPDATE token_name = :token_name";
-        $stmt = $pdo->prepare($sql);
+        $stmt = $pdo->prepare("INSERT INTO favourites (user_id, token_name) VALUES (:user_id, :token_name) ON DUPLICATE KEY UPDATE token_name = :token_name");
 
         foreach ($tokens as $token) {
-            $stmt->execute([':token_name' => $token]);
+            $stmt->execute([':user_id' => $userId, ':token_name' => $token]);
         }
     }
 
-    public function displayFavouriteTokens($pdo)
+    public function displayFavouriteTokens(PDO $pdo, ?string $userId)
     {
-        $data = $pdo->query("SELECT * FROM favourites")->fetchAll();
-        $userFavouriteTokens = [];
-        foreach ($data as $row) {
-            $userFavouriteTokens[] = $row['token_name'];
+        $stmt = $pdo->prepare("SELECT * FROM favourites WHERE user_id = :id");
+        $stmt->execute(['id' => $userId]);
+        $result = $stmt->fetchAll();
+
+        if ($result === false) {
+            return [];
         }
-        return $userFavouriteTokens;
+
+        if ($result !== false) {
+            $userFavouriteTokens = [];
+            foreach ($result as $row) {
+                $userFavouriteTokens[] = $row['token_name'];
+            }
+            return $userFavouriteTokens;
+        }
     }
 
-    public function deleteFavouriteTokens($pdo, $tokens)
+    public function deleteFavouriteTokens(PDO $pdo, string $userId, array $token)
     {
-        $placeholders = implode(',', array_fill(0, count($tokens), '?'));
-        $sql = "DELETE FROM favourites WHERE token_name IN ($placeholders)";
-        $stmt = $pdo->prepare($sql);
-        $stmt->execute($tokens);
+        $deleteToken = implode('', $token);
+        $stmt = $pdo->prepare("DELETE FROM favourites WHERE token_name = :token AND user_id = :id");
+        $stmt->execute(['id' => $userId, 'token' => $deleteToken]);
     }
 
-    public function isTokenFavourite($token, $favourites)
+    public function isTokenFavourite(string $token, array $favourites)
     {
         if (!in_array($token, $favourites)) {
             return false;
         };
 
         return true;
+    }
+
+    public function validateRegisterUser(PDO $pdo, string $username)
+    {
+        $registeredEmails = $pdo->query("SELECT mail FROM users")->fetchAll();
+
+        foreach ($registeredEmails as $email) {
+            if (password_verify($username, $email['mail'])) {
+                return [
+                    'mail' => false,
+                    'error' => 'Error: Invalid User credentials'
+                ];
+            } else {
+                return [
+                    'mail' => true,
+                ];
+            }
+        }
+    }
+
+    public function addNewUser(PDO $pdo, string $username, string $password)
+    {
+        $usernameHashed = password_hash($username, PASSWORD_BCRYPT);
+        $passwordHashed = password_hash($password, PASSWORD_BCRYPT);
+
+        $stmt = $pdo->prepare("INSERT INTO users (mail, password) VALUES (:username, :password)");
+        $stmt->execute([':username' => $usernameHashed, ':password' => $passwordHashed]);
+        return [
+            'credentials' => true,
+            'message' => 'Created New User!'
+        ];
+    }
+
+    public function authenticateLoginUser(PDO $pdo, string $username, string $password)
+    {
+        $allUsers = $pdo->query("SELECT * FROM users")->fetchAll();
+
+        foreach ($allUsers as $user) {
+            if (password_verify($username, $user['mail'])) {
+                if (password_verify($password, $user['password'])) {
+                    return $user['id'];
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public function ipCount(PDO $pdo, string $ipAddress)
+    {
+        $allIpAddresses = $pdo->query("SELECT client_ip_address FROM ip_count")->fetchAll();
+
+        if ($allIpAddresses === []) {
+            $stmt = $pdo->prepare("INSERT INTO ip_count (client_ip_address, count) VALUES (:ip_address, :count)");
+            $stmt->execute(['ip_address' => $ipAddress, 'count' => 1]);
+            return true;
+        }
+
+        $ipInDatabase = false;
+        foreach ($allIpAddresses as $address) {
+            if (in_array($ipAddress, $address)) {
+                $ipInDatabase = true;
+            }
+        }
+
+        if ($ipInDatabase === false) {
+            $stmt = $pdo->prepare("INSERT INTO ip_count (client_ip_address, count) VALUES (:ip_address, :count)");
+            $stmt->execute(['ip_address' => $ipAddress, 'count' => 1]);
+            return true;
+        }
+
+        if ($ipInDatabase == true) {
+            $stmt = $pdo->prepare("SELECT timestamp, count FROM ip_count WHERE client_ip_address = :ip");
+            $stmt->execute(['ip' => $ipAddress]);
+            $result = $stmt->fetch();
+
+            if ($result['count'] <= 3) {
+                $newCount = $result['count'] + 1;
+
+                $stmt = $pdo->prepare("UPDATE ip_count SET timestamp = CURRENT_TIMESTAMP , count = :count WHERE client_ip_address = :ip");
+                $stmt->execute(['count' => $newCount, 'ip' => $ipAddress]);
+                return true;
+            }
+
+            if ($result['count'] > 3) {
+
+                $currentTime = new DateTime();
+                $lastTimeStamp = new DateTime($result['timestamp']);
+                $timeDifference = $currentTime->getTimestamp() - $lastTimeStamp->getTimestamp();
+
+                if ($timeDifference < 60) {
+                    return false;
+                }
+
+                if ($timeDifference > 60) {
+                    $stmt = $pdo->prepare("UPDATE ip_count SET timestamp = CURRENT_TIMESTAMP , count = :count WHERE client_ip_address = :ip");
+                    $stmt->execute(['count' => 1, 'ip' => $ipAddress]);
+                    return true;
+                }
+            }
+        }
+    }
+
+    public function removeIpCount(PDO $pdo, string $ipAddress)
+    {
+        $stmt = $pdo->prepare("UPDATE ip_count SET timestamp = CURRENT_TIMESTAMP , count = :count WHERE client_ip_address = :ip");
+        $stmt->execute(['count' => 1, 'ip' => $ipAddress]);
     }
 }

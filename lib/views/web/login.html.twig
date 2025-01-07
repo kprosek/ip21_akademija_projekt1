@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Crypto Currencies - Login</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+<header>
+        <h1>Welcome to Login page!</h1>
+</header>
+
+<main> 
+    <form action="process_login.php" method="post" class="form-login">
+        <label id="input_username">Username:</label>
+        <input name="input_username" type="text" placeholder="Jane Doe" required>
+
+        <label id="input_password">Password:</label>
+        <input name="input_password" type="password" placeholder="********" required>
+    
+    {% if error is not null %}
+        <p class="text-error">{{error}}</p>
+    {% endif %}
+
+    {% if timeout is not null %}
+        <p class="text-error">{{timeout}}</p>
+    {% endif %}
+        
+        <button class="btn">Login</button>
+    </form>
+</main>
+
+<footer>
+    <p class="text-footer">Project created in 2024</p>
+</footer>
+</body>
+</html>
