@@ -155,10 +155,11 @@ class Model
 
     public function validateRegisterUser(PDO $pdo, string $username)
     {
-        $registeredEmails = $pdo->query("SELECT mail FROM users")->fetchAll();
+        $registeredEmails = $pdo->query("SELECT mail FROM users")->fetchAll(PDO::FETCH_ASSOC);
 
         foreach ($registeredEmails as $email) {
-            if (password_verify($username, $email['mail'])) {
+
+            if ($username === $email['mail']) {
                 return [
                     'mail' => false,
                     'error' => 'Error: Invalid User credentials'
@@ -173,11 +174,10 @@ class Model
 
     public function addNewUser(PDO $pdo, string $username, string $password)
     {
-        $usernameHashed = password_hash($username, PASSWORD_BCRYPT);
         $passwordHashed = password_hash($password, PASSWORD_BCRYPT);
 
         $stmt = $pdo->prepare("INSERT INTO users (mail, password) VALUES (:username, :password)");
-        $stmt->execute([':username' => $usernameHashed, ':password' => $passwordHashed]);
+        $stmt->execute([':username' => $username, ':password' => $passwordHashed]);
         return [
             'credentials' => true,
             'message' => 'Created New User!'
@@ -186,12 +186,12 @@ class Model
 
     public function authenticateLoginUser(PDO $pdo, string $username, string $password)
     {
-        $allUsers = $pdo->query("SELECT * FROM users")->fetchAll();
+        $allUsers = $pdo->query("SELECT * FROM users")->fetchAll(PDO::FETCH_ASSOC);
 
-        foreach ($allUsers as $user) {
-            if (password_verify($username, $user['mail'])) {
-                if (password_verify($password, $user['password'])) {
-                    return $user['id'];
+        foreach ($allUsers as $email) {
+            if ($username === $email['mail']) {
+                if (password_verify($password, $email['password'])) {
+                    return $email['id'];
                 }
             }
         }
