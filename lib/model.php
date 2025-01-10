@@ -1,13 +1,24 @@
 <?php
 
+namespace App;
+
+use PDO;
+use DateTime;
+use League\Config\Configuration;
+
 class Model
 {
+    private $config;
     private $listOfCurrencies = null;
-    private $apiUrl = 'https://api.coinbase.com/v2/';
+
+    public function __construct(Configuration $config)
+    {
+        $this->config = $config;
+    }
 
     private function getApiData(string $apiEndpoint): array|false
     {
-        $json = file_get_contents($this->apiUrl . $apiEndpoint);
+        $json = file_get_contents($this->config->get('api.base_url') . $apiEndpoint);
         if (empty($json)) {
             return false;
         }
@@ -140,6 +151,7 @@ class Model
     public function deleteFavouriteTokens(PDO $pdo, string $userId, array $token)
     {
         $deleteToken = implode('', $token);
+        
         $stmt = $pdo->prepare("DELETE FROM favourites WHERE token_name = :token AND user_id = :id");
         $stmt->execute(['id' => $userId, 'token' => $deleteToken]);
     }
@@ -157,19 +169,19 @@ class Model
     {
         $registeredEmails = $pdo->query("SELECT mail FROM users")->fetchAll(PDO::FETCH_ASSOC);
 
+        $emailNotInDatabase = [
+            'mail' => true,
+        ];
         foreach ($registeredEmails as $email) {
 
             if ($username === $email['mail']) {
-                return [
+                return $emailNotInDatabase[] = [
                     'mail' => false,
                     'error' => 'Error: Invalid User credentials'
                 ];
-            } else {
-                return [
-                    'mail' => true,
-                ];
             }
         }
+        return $emailNotInDatabase;
     }
 
     public function addNewUser(PDO $pdo, string $username, string $password)

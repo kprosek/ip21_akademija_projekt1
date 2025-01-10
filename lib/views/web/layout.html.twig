@@ -11,11 +11,11 @@
     {% if is_logged_in %}
     <section class="section-logout">
         <p>Logged in with {{ user }}</p>
-        <a class="btn-logout" href="/logout.php">Logout</a>
+        <a class="btn-logout" href="/logout">Logout</a>
     </section>
     {% else %}    
     <section class="section-login">
-        <a class="btn-login" href="/login.php">Login</a>
+        <a class="btn-login" href="/login">Login</a>
     </section>
     {% endif %}
 
@@ -48,7 +48,7 @@
         <h2>Tokens</h2>
     </section>
   
-    <form action="show-price.php" method="get" class="form-select-tokens">
+    <form action="/show-price" method="get" class="form-select-tokens">
         <label id="dropdown_token_from">from</label>
     <section class="section-select-token">
         <button class="btn btn-favourite" name="btn_from" type="submit" formmethod="post">

@@ -1,11 +1,49 @@
 # ip21_akademija_projekt1
 
-Application for accessing cryptocurrency price data, built step by step.
+Application for accessing cryptocurrency price data, built step by step with php.
 
-At its current state, the App makes an API call, decodes json file and displays the value of selected crypto in the selected currency.
-It can also handle certain common errors and now has basic MVC structure.
+This app was created as part of mentoring programme of Inštitut za priložnosti 21. stoletja (IP21). 
 
+## Prerequisites
 
+- Docker
+- Docker Compose
+- Ports 80, 443 and 8080 should be free
 
+## Project Setup
 
+1. Clone the project
 
+Run `git clone <project_url>`
+
+2. Navigate to project directory
+
+Run `cd <project_directory_name>`
+
+3. Build
+
+Run `docker compose up`
+
+4. Login to the environment
+
+Run `docker compose exec php_app bash`
+
+5. Install Composer dependencies
+
+Run `composer install`
+
+## Access
+
+**Aplication:**
+
+[https://localhost/]
+
+**Database:**
+
+[https://localhost:8080/]
+
+## Usage
+
+**CLI:**
+
+Run `php console.php 'help'`

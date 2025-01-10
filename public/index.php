@@ -1,34 +1,25 @@
 <?php
+
 require_once '../vendor/autoload.php';
-require_once '../lib/model.php';
 
-session_start();
+use League\Route\Router;
+use Laminas\Diactoros\ServerRequestFactory;
+use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
+use App\Controllers\HomeController;
+use App\Controllers\LoginController;
+use App\Controllers\ProcessLoginController;
+use App\Controllers\ShowPriceController;
+use App\Controllers\LogoutController;
 
-$model = new Model();
+$router = new Router();
 
-$loader = new \Twig\Loader\FilesystemLoader('../lib/views/web');
-$twig = new \Twig\Environment($loader, []);
-$pdo = $model->databaseConnection('../');
-$userLoggedIn = isset($_SESSION['logged_in_as']);
+$router->map('GET', '/', [HomeController::class, 'showHomePage']);
+$router->map('GET', '/login', [LoginController::class, 'showLoginPage']);
+$router->map('POST', '/process-login', [ProcessLoginController::class, 'processLogin']);
+$router->map(['GET', 'POST'], '/show-price', [ShowPriceController::class, 'showPricePage']);
+$router->map('GET', '/logout', [LogoutController::class, 'logout']);
 
-if ($userLoggedIn) {
-    $username = $_SESSION['user'];
-    $userId = $_SESSION['logged_in_as'];
-} else {
-    $username = null;
-    $userId = null;
-}
+$request = ServerRequestFactory::fromGlobals();
+$response = $router->dispatch($request);
 
-$list = $model->getList();
-$favourites = $model->displayFavouriteTokens($pdo, $userId);
-
-$dropdownList = array_merge($favourites, array_filter($list, function ($value) use ($favourites) {
-    return !in_array($value, $favourites);
-}));
-
-function renderIndexView($twig, array $dropdownList, array $favourites, ?string $username, bool $userLoggedIn)
-{
-    echo $twig->render('index.html.twig', ['favourites' => $favourites, 'items' => $dropdownList, 'user' => $username, 'is_logged_in' => $userLoggedIn]);
-};
-
-renderIndexView($twig, $dropdownList, $favourites, $username, $userLoggedIn);
+(new SapiEmitter())->emit($response);
