@@ -2,7 +2,7 @@
 
 Application for accessing cryptocurrency price data, built step by step with php.
 
-This app was created as part of mentoring programme of Inštitut za priložnosti 21. stoletja (IP21). 
+This app was created as part of mentoring program of Inštitut za priložnosti 21. stoletja (IP21). 
 
 ## Prerequisites
 
